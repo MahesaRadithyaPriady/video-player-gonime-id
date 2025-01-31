@@ -76,11 +76,11 @@
       .settings-container.show {
         display: flex;
       }
-    
-      .settings-content-quality.show{
+
+      .settings-content-quality.show {
         display: flex;
       }
-      .hiddenAll{
+      .hiddenAll {
         display: none;
       }
     </style>
@@ -107,68 +107,80 @@
           </div>
 
           <!-- Menu Settings -->
-          <div
-            class="settings-container  absolute flex-col top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3"
-          >
-            <div class="title">
-              <h1 class="text-lg font-bold">Settings Video</h1>
+          <div class="settings-main">
+            <div
+              class="settings-container absolute flex-col top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3"
+            >
+              <div class="title">
+                <h1 class="text-lg font-bold">Settings Video</h1>
+              </div>
+              <div class="settings-item flex gap-3">
+                <h1
+                  class="quality-triger text-sm font-bold hover:cursor-pointer"
+                >
+                  Quality Settings
+                </h1>
+              </div>
+              <div class="settings-item flex gap-3">
+                <h1 class="text-sm font-bold hover:cursor-pointer">
+                  Subtitle Settings
+                </h1>
+              </div>
+              <div class="settings-item flex gap-3">
+                <h1 class="text-sm font-bold hover:cursor-pointer">
+                  Speed Video Settings
+                </h1>
+              </div>
+              <div class="settings-item flex gap-3">
+                <h1 class="text-sm font-bold hover:cursor-pointer">
+                  Sound Settings
+                </h1>
+              </div>
             </div>
-            <div class="settings-item flex gap-3">
-              <h1 class="quality-triger text-sm font-bold hover:cursor-pointer">
-                Quality Settings
-              </h1>
-            </div>
-            <div class="settings-item flex gap-3">
-              <h1 class="text-sm font-bold hover:cursor-pointer">
-                Subtitle Settings
-              </h1>
-            </div>
-            <div class="settings-item flex gap-3">
-              <h1 class="text-sm font-bold hover:cursor-pointer">
-                Speed Video Settings
-              </h1>
-            </div>
-            <div class="settings-item flex gap-3">
-              <h1 class="text-sm font-bold hover:cursor-pointer">
-                Sound Settings
-              </h1>
-            </div>
-          </div>
-
-             <!-- Menu Settings Content Quality -->
-             <div class="settings-content-quality absolute flex-col hidden top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3">
+            <!-- Menu Settings Content Quality -->
+            <div
+              class="settings-content-quality absolute flex-col hidden top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3"
+            >
               <div class="title flex gap-3">
-                <button class="back-button"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="back-button">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
                 <h1 class="text-lg font-bold">Quality Settings</h1>
               </div>
               <div class="settings-item flex gap-3 items-center">
                 <div class="icons">
                   <i class="fa-solid fa-crown"></i>
                 </div>
-                <h1 class="quality-1080 text-sm font-bold hover:cursor-pointer">1080p</h1>
+                <h1 class="quality-1080 text-sm font-bold hover:cursor-pointer">
+                  1080p
+                </h1>
               </div>
               <div class="settings-item flex gap-3 items-center">
                 <div class="icons">
                   <i class="fa-solid fa-bolt"></i>
                 </div>
-                <h1 class="quality-720p text-sm font-bold hover:cursor-pointer">720p</h1>
+                <h1 class="quality-720p text-sm font-bold hover:cursor-pointer">
+                  720p
+                </h1>
               </div>
               <div class="settings-item flex gap-3 items-center">
                 <div class="icons">
                   <i class="fa-solid fa-bolt"></i>
                 </div>
-                <h1 class="quality-480p text-sm font-bold hover:cursor-pointer">480p</h1>
+                <h1 class="quality-480p text-sm font-bold hover:cursor-pointer">
+                  480p
+                </h1>
               </div>
               <div class="settings-item flex gap-3 items-center">
                 <div class="icons">
                   <i class="fa-solid fa-bolt"></i>
                 </div>
-                <h1 class="quality-360p text-sm font-bold hover:cursor-pointer">360p</h1>
+                <h1 class="quality-360p text-sm font-bold hover:cursor-pointer">
+                  360p
+                </h1>
               </div>
             </div>
-            
-
-
+          </div>
 
           <!-- Kontrol Video -->
           <div
@@ -219,7 +231,9 @@
       const settingsContainer = document.querySelector(".settings-container");
       const qualityTriger = document.querySelector(".quality-triger");
       const backButton = document.querySelector(".back-button");
-const settingsContentQuality = document.querySelector(".settings-content-quality");
+      const settingsContentQuality = document.querySelector(
+        ".settings-content-quality"
+      );
 
       let hideControlsTimeout;
       let hideCursorTimeout;
@@ -232,10 +246,9 @@ const settingsContentQuality = document.querySelector(".settings-content-quality
         hideControlsTimeout = setTimeout(() => {
           controls.classList.add("hidenn-opacity");
           topElements.classList.add("hidenn-opacity");
-          settingsContentQuality.classList.add('hidenn-opacity')
-          settingsContainer.classList.remove('show')
+          settingsContentQuality.classList.add("hidenn-opacity");
+          settingsContainer.classList.remove("show");
           settingsContainer.classList.add("hidenn-opacity");
-
         }, 5000);
       }
 
@@ -244,7 +257,7 @@ const settingsContentQuality = document.querySelector(".settings-content-quality
         controls.classList.remove("hidenn-opacity");
         topElements.classList.remove("hidenn-opacity");
         settingsContainer.classList.remove("hidenn-opacity");
-        settingsContentQuality.classList.remove('hidenn-opacity')
+        settingsContentQuality.classList.remove("hidenn-opacity");
 
         hideControls(); // Pastikan tetap hide setelah 2 detik
       }
@@ -352,17 +365,12 @@ const settingsContentQuality = document.querySelector(".settings-content-quality
 
       // Show settings popup
       settingsButton.addEventListener("click", (e) => {
-        e.stopPropagation(); // Prevent clicking on settings button from closing the popup
-        if(settingsContainer.classList.contains('flex')){
-          settingsContainer.classList.remove('flex')
-        }else{
-          settingsContainer.classList.toggle("flex");
+        e.stopPropagation();
+        settingsContainer.classList.toggle("flex");
+        if (settingsContainer.classList.contains("flex")) {
+          const settingsMain = document.querySelector(".settings-main");
+          settingsMain.classList.add("show");
         }
-        if(settingsContainer.classList.contains('show')){
-          settingsContainer.classList.remove('show')
-        }
-
-
       });
 
       // Close settings popup when clicking outside
@@ -386,22 +394,19 @@ const settingsContentQuality = document.querySelector(".settings-content-quality
       });
 
       // Settings quality trigger
-  qualityTriger.addEventListener("click", () => {
-  const qualitySettings = document.querySelector(".settings-content-quality");
-  settingsContainer.classList.remove('flex')
-  qualitySettings.classList.add("show");
-  });
+      qualityTriger.addEventListener("click", () => {
+        const qualitySettings = document.querySelector(
+          ".settings-content-quality"
+        );
+        settingsContainer.classList.remove("flex");
+        qualitySettings.classList.add("show");
+      });
 
-
-// Menambahkan event listener pada tombol kembali
-backButton.addEventListener("click", () => {
-  settingsContainer.classList.add('show')
-  settingsContentQuality.classList.remove('show')
-  
-});
-
-
-      
+      // Menambahkan event listener pada tombol kembali
+      backButton.addEventListener("click", () => {
+        settingsContainer.classList.add("flex");
+        settingsContentQuality.classList.remove("show");
+      });
     </script>
   </body>
 </html>
