@@ -367,6 +367,11 @@
       settingsButton.addEventListener("click", (e) => {
         e.stopPropagation();
         settingsContainer.classList.toggle("flex");
+        if (settingsContentQuality.classList.contains("show")) {
+          settingsContentQuality.classList.remove("show");
+          settingsContainer.classList.remove("flex");
+        }
+
         if (settingsContainer.classList.contains("flex")) {
           const settingsMain = document.querySelector(".settings-main");
           settingsMain.classList.add("show");
