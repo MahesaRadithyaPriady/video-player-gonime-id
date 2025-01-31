@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Player</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .video-wrapper {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        overflow: hidden;
+        border-radius: 0.5rem;
+      }
+
+      .video-wrapper video {
+        background-color: black;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      /* Progress Bar Styling */
+      .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: gray;
+        border-radius: 3px;
+        position: relative;
+        cursor: pointer;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: white;
+        width: 0%;
+        border-radius: 3px;
+        transition: width 0.1s linear;
+      }
+
+      /* Animasi Hide Controls */
+      .controls,
+      .top-elements,
+      .settings-container {
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      .hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Hilangkan kontrol default browser */
+      video::-webkit-media-controls {
+        display: none !important;
+      }
+
+      /* Menyembunyikan cursor */
+      .hide-cursor {
+        cursor: none;
+      }
+
+      /* Popup Settings */
+      .settings-container {
+        display: none;
+      }
+      .settings-container.show {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-600">
+    <div class="flex min-h-screen justify-center items-center">
+      <div class="w-full max-w-4xl">
+        <div class="video-wrapper">
+          <!-- Top Elements -->
+          <div
+            class="top-elements absolute top-0 flex justify-between w-full z-10 p-3 bg-gradient-to-b from-black to-transparent"
+          >
+            <h1 class="text-white font-bold text-2xl">Testing Video</h1>
+            <div class="flex gap-3">
+              <button class="bg-gray-800 rounded-full p-3 text-white font-bold">
+                <i class="fas fa-window-restore"></i>
+              </button>
+              <button
+                class="settings bg-gray-800 rounded-full p-3 text-white font-bold"
+              >
+                <i class="fas fa-cogs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Menu Settings -->
+          <div
+            class="settings-container absolute flex-col top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3"
+          >
+            <div class="title">
+              <h1 class="text-lg font-bold">Settings Video</h1>
+            </div>
+            <div class="settings-item flex gap-3">
+              <h1 class="quality-triger text-sm font-bold hover:cursor-pointer">
+                Quality Settings
+              </h1>
+            </div>
+            <div class="settings-item flex gap-3">
+              <h1 class="text-sm font-bold hover:cursor-pointer">
+                Subtitle Settings
+              </h1>
+            </div>
+            <div class="settings-item flex gap-3">
+              <h1 class="text-sm font-bold hover:cursor-pointer">
+                Speed Video Settings
+              </h1>
+            </div>
+            <div class="settings-item flex gap-3">
+              <h1 class="text-sm font-bold hover:cursor-pointer">
+                Sound Settings
+              </h1>
+            </div>
+          </div>
+
+          <!-- Kontrol Video -->
+          <div
+            class="controls absolute bottom-0 px-4 flex flex-col w-full z-10"
+          >
+            <div class="controls-items flex justify-between py-3 items-center">
+              <div class="controls-left flex gap-3 items-center">
+                <button
+                  class="play bg-gray-800 rounded-full p-3 px-4 text-white font-bold"
+                >
+                  <i class="fas fa-play"></i>
+                </button>
+                <p class="time-line text-white">0:00 / 0:00</p>
+              </div>
+              <button
+                class="fullScreen bg-gray-800 rounded-full p-3 px-4 text-white font-bold"
+              >
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+            <!-- Progress Bar -->
+            <div class="progress w-full pb-3">
+              <div class="progress-bar">
+                <div class="progress-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video Player -->
+          <video class="rounded-lg">
+            <source src="assets/video/video.mp4" />
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const video = document.querySelector("video");
+      const playPause = document.querySelector(".play");
+      const fullScreen = document.querySelector(".fullScreen");
+      const timeLine = document.querySelector(".time-line");
+      const progressBar = document.querySelector(".progress-bar");
+      const progressFill = document.querySelector(".progress-fill");
+      const controls = document.querySelector(".controls");
+      const topElements = document.querySelector(".top-elements");
+      const videoWrapper = document.querySelector(".video-wrapper");
+      const settingsButton = document.querySelector(".settings");
+      const settingsContainer = document.querySelector(".settings-container");
+      const qualityTriger = document.querySelector(".quality-triger");
+
+      let hideControlsTimeout;
+      let hideCursorTimeout;
+      let idleTimeout;
+
+      // Hilangkan kontrol bawaan video
+      video.controls = false;
+
+      function hideControls() {
+        hideControlsTimeout = setTimeout(() => {
+          controls.classList.add("hide");
+          topElements.classList.add("hide");
+          settingsContainer.classList.add("hide");
+        }, 5000);
+      }
+
+      function showControls() {
+        clearTimeout(hideControlsTimeout);
+        controls.classList.remove("hide");
+        topElements.classList.remove("hide");
+        settingsContainer.classList.remove("hide");
+        hideControls(); // Pastikan tetap hide setelah 2 detik
+      }
+
+      function hideCursor() {
+        hideCursorTimeout = setTimeout(() => {
+          videoWrapper.classList.add("hide-cursor");
+        }, 5000);
+      }
+
+      function showCursor() {
+        clearTimeout(hideCursorTimeout);
+        videoWrapper.classList.remove("hide-cursor");
+        hideCursor(); // Pastikan tetap hide setelah 2 detik
+      }
+
+      // Play/Pause Button
+      playPause.addEventListener("click", () => {
+        if (video.paused) {
+          video.play();
+          playPause.innerHTML = '<i class="fas fa-pause"></i>';
+        } else {
+          video.pause();
+          playPause.innerHTML = '<i class="fas fa-play"></i>';
+        }
+        showControls();
+        showCursor();
+      });
+
+      // Fullscreen Button
+      fullScreen.addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+          videoWrapper.requestFullscreen().catch((err) => console.error(err));
+        } else {
+          document.exitFullscreen().catch((err) => console.error(err));
+        }
+        showControls();
+        showCursor();
+      });
+
+      // Update Progress Bar
+      video.addEventListener("timeupdate", () => {
+        const progress = (video.currentTime / video.duration) * 100;
+        progressFill.style.width = `${progress}%`;
+
+        // Update waktu video
+        const currentTime = formatTime(video.currentTime);
+        const duration = formatTime(video.duration);
+        timeLine.textContent = `${currentTime} / ${duration}`;
+      });
+
+      // Klik progress bar untuk melompat ke waktu tertentu
+      progressBar.addEventListener("click", (e) => {
+        const clickX = e.offsetX;
+        const progressWidth = progressBar.clientWidth;
+        const seekTime = (clickX / progressWidth) * video.duration;
+        video.currentTime = seekTime;
+        showControls();
+        showCursor();
+      });
+
+      function formatTime(time) {
+        if (isNaN(time)) return "0:00";
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+      }
+
+      // Mouse Enter / Leave to show or hide controls only inside the video
+      video.addEventListener("mouseenter", () => {
+        showControls();
+        showCursor();
+      });
+
+      video.addEventListener("mouseleave", () => {
+        hideControls();
+        hideCursor();
+      });
+
+      // Fungsi untuk menangani perubahan fullscreen
+      function handleFullScreenChange() {
+        if (document.fullscreenElement) {
+          // Jika fullscreen, tambahkan listener untuk mendeteksi aktivitas mouse
+          document.addEventListener("mousemove", handleMouseMoveFullscreen);
+        } else {
+          // Jika keluar fullscreen, hapus listener agar tidak terus berjalan
+          document.removeEventListener("mousemove", handleMouseMoveFullscreen);
+        }
+      }
+
+      // Fungsi untuk menampilkan kontrol saat fullscreen
+      function handleMouseMoveFullscreen() {
+        clearTimeout(idleTimeout);
+        showControls();
+        showCursor();
+
+        idleTimeout = setTimeout(() => {
+          hideControls();
+          hideCursor();
+        }, 5000); // Sembunyikan kontrol setelah 5 detik tanpa aktivitas
+      }
+
+      // Event listener untuk menangani perubahan fullscreen
+      document.addEventListener("fullscreenchange", handleFullScreenChange);
+
+      // Show settings popup
+      settingsButton.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent clicking on settings button from closing the popup
+        settingsContainer.classList.toggle("show");
+      });
+
+      // Close settings popup when clicking outside
+      document.addEventListener("click", (e) => {
+        if (
+          !settingsContainer.contains(e.target) &&
+          !settingsButton.contains(e.target)
+        ) {
+          settingsContainer.classList.remove("show");
+        }
+      });
+
+      // Prevent closing popup when clicking inside settings container
+      settingsContainer.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      // Mengubah tombol play kembali ke play jika video habis
+      video.addEventListener("ended", () => {
+        playPause.innerHTML = '<i class="fas fa-play"></i>';
+      });
+
+      // Ketika Quality Di Klik
+      qualityTriger.addEventListener("click", () => {
+        settingsContainer.innerHTML = `
+            <div class="title">
+              <h1 class="text-lg font-bold">Quality Settings</h1>
+            </div>
+            <div class="quality flex flex-col gap-3">
+              <div class="quality-item hover:cursor-pointer">
+                <h1 class="text-sm font-bold">1080p</h1>
+              </div>
+              <div class="quality-item hover:cursor-pointer">
+                <h1 class="text-sm font-bold">720p</h1>
+              </div>
+              <div class="quality-item hover:cursor-pointer">
+                <h1 class="text-sm font-bold">480p</h1>
+              </div>
+            </div>
+            `;
+      });
+    </script>
+  </body>
+</html>
