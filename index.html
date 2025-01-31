@@ -121,7 +121,7 @@
                   Quality Settings
                 </h1>
               </div>
-              <div class="settings-item flex gap-3">
+              <div class="settings-item flex gap-3" id="subtitle">
                 <h1 class="text-sm font-bold hover:cursor-pointer">
                   Subtitle Settings
                 </h1>
@@ -180,6 +180,41 @@
                 </h1>
               </div>
             </div>
+            <!-- Menu Settings Content Subtitle -->
+            <div
+              class="settings-content-subtitle absolute flex-col hidden top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3"
+            >
+              <div class="title flex gap-3">
+                <button class="back-button">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <h1 class="text-lg font-bold">Subtitle Settings</h1>
+              </div>
+              <div class="settings-item flex gap-3 items-center">
+                <div class="icons">
+                  <i class="fa-regular fa-closed-captioning"></i>
+                </div>
+                <h1 class="subtitle-off text-sm font-bold hover:cursor-pointer">
+                  Off
+                </h1>
+              </div>
+              <div class="settings-item flex gap-3 items-center">
+                <div class="icons">
+                  <i class="fa-solid fa-closed-captioning"></i>
+                </div>
+                <h1 class="subtitle-id text-sm font-bold hover:cursor-pointer">
+                  Indonesia
+                </h1>
+              </div>
+              <div class="settings-item flex gap-3 items-center">
+                <div class="icons">
+                  <i class="fa-regular fa-closed-captioning"></i>
+                </div>
+                <h1 class="subtitle-en text-sm font-bold hover:cursor-pointer">
+                  English
+                </h1>
+              </div>
+            </div>
           </div>
 
           <!-- Kontrol Video -->
@@ -217,205 +252,6 @@
       </div>
     </div>
 
-    <script>
-      const video = document.querySelector("video");
-      const playPause = document.querySelector(".play");
-      const fullScreen = document.querySelector(".fullScreen");
-      const timeLine = document.querySelector(".time-line");
-      const progressBar = document.querySelector(".progress-bar");
-      const progressFill = document.querySelector(".progress-fill");
-      const controls = document.querySelector(".controls");
-      const topElements = document.querySelector(".top-elements");
-      const videoWrapper = document.querySelector(".video-wrapper");
-      const settingsButton = document.querySelector(".settings");
-      const settingsContainer = document.querySelector(".settings-container");
-      const qualityTriger = document.querySelector(".quality-triger");
-      const backButton = document.querySelector(".back-button");
-      const settingsContentQuality = document.querySelector(
-        ".settings-content-quality"
-      );
-
-      let hideControlsTimeout;
-      let hideCursorTimeout;
-      let idleTimeout;
-
-      // Hilangkan kontrol bawaan video
-      video.controls = false;
-
-      function hideControls() {
-        hideControlsTimeout = setTimeout(() => {
-          controls.classList.add("hidenn-opacity");
-          topElements.classList.add("hidenn-opacity");
-          settingsContentQuality.classList.add("hidenn-opacity");
-          settingsContainer.classList.remove("show");
-          settingsContainer.classList.add("hidenn-opacity");
-        }, 5000);
-      }
-
-      function showControls() {
-        clearTimeout(hideControlsTimeout);
-        controls.classList.remove("hidenn-opacity");
-        topElements.classList.remove("hidenn-opacity");
-        settingsContainer.classList.remove("hidenn-opacity");
-        settingsContentQuality.classList.remove("hidenn-opacity");
-
-        hideControls(); // Pastikan tetap hide setelah 2 detik
-      }
-
-      function hideCursor() {
-        hideCursorTimeout = setTimeout(() => {
-          videoWrapper.classList.add("hide-cursor");
-        }, 5000);
-      }
-
-      function showCursor() {
-        clearTimeout(hideCursorTimeout);
-        videoWrapper.classList.remove("hide-cursor");
-        hideCursor(); // Pastikan tetap hide setelah 2 detik
-      }
-
-      // Play/Pause Button
-      playPause.addEventListener("click", () => {
-        if (video.paused) {
-          video.play();
-          playPause.innerHTML = '<i class="fas fa-pause"></i>';
-        } else {
-          video.pause();
-          playPause.innerHTML = '<i class="fas fa-play"></i>';
-        }
-        showControls();
-        showCursor();
-      });
-
-      // Fullscreen Button
-      fullScreen.addEventListener("click", () => {
-        if (!document.fullscreenElement) {
-          videoWrapper.requestFullscreen().catch((err) => console.error(err));
-        } else {
-          document.exitFullscreen().catch((err) => console.error(err));
-        }
-        showControls();
-        showCursor();
-      });
-
-      // Update Progress Bar
-      video.addEventListener("timeupdate", () => {
-        const progress = (video.currentTime / video.duration) * 100;
-        progressFill.style.width = `${progress}%`;
-
-        // Update waktu video
-        const currentTime = formatTime(video.currentTime);
-        const duration = formatTime(video.duration);
-        timeLine.textContent = `${currentTime} / ${duration}`;
-      });
-
-      // Klik progress bar untuk melompat ke waktu tertentu
-      progressBar.addEventListener("click", (e) => {
-        const clickX = e.offsetX;
-        const progressWidth = progressBar.clientWidth;
-        const seekTime = (clickX / progressWidth) * video.duration;
-        video.currentTime = seekTime;
-        showControls();
-        showCursor();
-      });
-
-      function formatTime(time) {
-        if (isNaN(time)) return "0:00";
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-      }
-
-      // Mouse Enter / Leave to show or hide controls only inside the video
-      video.addEventListener("mouseenter", () => {
-        showControls();
-        showCursor();
-      });
-
-      video.addEventListener("mouseleave", () => {
-        hideControls();
-        hideCursor();
-      });
-
-      // Fungsi untuk menangani perubahan fullscreen
-      function handleFullScreenChange() {
-        if (document.fullscreenElement) {
-          // Jika fullscreen, tambahkan listener untuk mendeteksi aktivitas mouse
-          document.addEventListener("mousemove", handleMouseMoveFullscreen);
-        } else {
-          // Jika keluar fullscreen, hapus listener agar tidak terus berjalan
-          document.removeEventListener("mousemove", handleMouseMoveFullscreen);
-        }
-      }
-
-      // Fungsi untuk menampilkan kontrol saat fullscreen
-      function handleMouseMoveFullscreen() {
-        clearTimeout(idleTimeout);
-        showControls();
-        showCursor();
-
-        idleTimeout = setTimeout(() => {
-          hideControls();
-          hideCursor();
-        }, 5000); // Sembunyikan kontrol setelah 5 detik tanpa aktivitas
-      }
-
-      // Event listener untuk menangani perubahan fullscreen
-      document.addEventListener("fullscreenchange", handleFullScreenChange);
-
-      // Show settings popup
-      settingsButton.addEventListener("click", (e) => {
-        e.stopPropagation();
-        settingsContainer.classList.toggle("flex");
-        if (settingsContentQuality.classList.contains("show")) {
-          settingsContentQuality.classList.remove("show");
-          settingsContainer.classList.remove("flex");
-        }
-
-        if (settingsContainer.classList.contains("flex")) {
-          const settingsMain = document.querySelector(".settings-main");
-          settingsMain.classList.add("show");
-        }
-      });
-
-      // Close settings popup when clicking outside
-      document.addEventListener("click", (e) => {
-        if (
-          !settingsContainer.contains(e.target) &&
-          !settingsButton.contains(e.target) &&
-          !backButton.contains(e.target)
-        ) {
-          settingsContainer.classList.remove("flex");
-        }
-      });
-
-      // Prevent closing popup when clicking inside settings container
-      settingsContainer.addEventListener("click", (e) => {
-        e.stopPropagation();
-      });
-
-      // Mengubah tombol play kembali ke play jika video habis
-      video.addEventListener("ended", () => {
-        playPause.innerHTML = '<i class="fas fa-play"></i>';
-      });
-
-      // Settings quality trigger
-      qualityTriger.addEventListener("click", () => {
-        const qualitySettings = document.querySelector(
-          ".settings-content-quality"
-        );
-        settingsContainer.classList.remove("flex");
-        qualitySettings.classList.add("show");
-      });
-
-      // Menambahkan event listener pada tombol kembali
-      backButton.addEventListener("click", () => {
-        const settingsMain = document.querySelector(".settings-main");
-        settingsMain.classList.add("show");
-        settingsContainer.classList.add("flex");
-
-        settingsContentQuality.classList.remove("show");
-      });
-    </script>
+    <script src="./assets/js/player-controllers.js"></script>
   </body>
 </html>
