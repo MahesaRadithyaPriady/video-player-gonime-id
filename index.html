@@ -377,7 +377,8 @@
       document.addEventListener("click", (e) => {
         if (
           !settingsContainer.contains(e.target) &&
-          !settingsButton.contains(e.target)
+          !settingsButton.contains(e.target) &&
+          !backButton.contains(e.target)
         ) {
           settingsContainer.classList.remove("flex");
         }
@@ -404,7 +405,10 @@
 
       // Menambahkan event listener pada tombol kembali
       backButton.addEventListener("click", () => {
+        const settingsMain = document.querySelector(".settings-main");
+        settingsMain.classList.add("show");
         settingsContainer.classList.add("flex");
+
         settingsContentQuality.classList.remove("show");
       });
     </script>
