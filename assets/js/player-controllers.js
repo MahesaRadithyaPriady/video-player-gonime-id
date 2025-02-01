@@ -26,16 +26,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const backward = document.querySelector(".backward");
   const forward = document.querySelector(".forward");
   const controlsTengah = document.querySelector(".controls-tengah");
-  const speedTrackNormal = document.querySelector('.speed-normal');
-  const speedTrackSlow = document.querySelector('.speed-0_5x');
-  const speedTrackFast = document.querySelector('.speed-2x');
-  const subtitleTrackID = document.querySelector('.subtitle-id');
-  const subtitleCustom = document.querySelector('.subtitle-custom');
-  const subtitleOff = document.querySelector('.subtitle-off');
-  const loaderContainer = document.querySelector('.loader-container');
-  const quality_1080p = document.querySelector('.quality-1080p');
-  const quality_720p = document.querySelector('.quality-720p');
-  const video_source = document.querySelector('.video-source')
+  const speedTrackNormal = document.querySelector(".speed-normal");
+  const speedTrackSlow = document.querySelector(".speed-0_5x");
+  const speedTrackFast = document.querySelector(".speed-2x");
+  const subtitleTrackID = document.querySelector(".subtitle-id");
+  const subtitleCustom = document.querySelector(".subtitle-custom");
+  const subtitleOff = document.querySelector(".subtitle-off");
+  const loaderContainer = document.querySelector(".loader-container");
+  const quality_1080p = document.querySelector(".quality-1080p");
+  const quality_720p = document.querySelector(".quality-720p");
+  const quality_480p = document.querySelector(".quality-480p");
+  const quality_360p = document.querySelector(".quality-360p");
+  const selected_1080p = document.querySelector(".selected-1080p");
+  const selected_720p = document.querySelector(".selected-720p");
+  const selected_480p = document.querySelector(".selected-480p");
+  const selected_360p = document.querySelector(".selected-360p");
+  const video_source = document.querySelector(".video-source");
   const normalSpeed = 1;
   const slowSpeed = 0.5;
   const speedFast = 2;
@@ -57,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
       subtitleTriger.classList.add("hidenn-opacity");
       speedContainer.classList.add("hidenn-opacity");
       controlsTengah.classList.add("hidenn-opacity");
-    }, 5000);
+    }, 3000);
   }
 
   function showControls() {
@@ -76,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(hideCursorTimeout);
     hideCursorTimeout = setTimeout(() => {
       videoWrapper.classList.add("hide-cursor");
-    }, 5000);
+    }, 3000);
   }
 
   function showCursor() {
@@ -92,15 +98,14 @@ document.addEventListener("DOMContentLoaded", () => {
     idleTimeout = setTimeout(() => {
       hideControls();
       hideCursor();
-    }, 5000);
+    }, 3000);
   });
 
-    // ! Ubah Kecepatan Video
+  // ! Ubah Kecepatan Video
 
-    function changeSpeedVideo(trackSpeed){
-      video.playbackRate = trackSpeed
-    }
-  
+  function changeSpeedVideo(trackSpeed) {
+    video.playbackRate = trackSpeed;
+  }
 
   function updatePlayPauseIcon() {
     const iconBig = video.paused
@@ -118,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (video.paused) {
       video.defaultPlaybackRate = normalSpeed;
       video.play();
-      
     } else {
       video.pause();
     }
@@ -343,27 +347,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-
-  speedTrackNormal.addEventListener('click',() => {
+  speedTrackNormal.addEventListener("click", () => {
     video.playbackRate = normalSpeed;
-    speedContainer.classList.remove('flex')
-    speedContainer.classList.add('hidden')
+    speedContainer.classList.remove("flex");
+    speedContainer.classList.add("hidden");
+  });
 
-  })
-
-  speedTrackSlow.addEventListener('click',() => {
+  speedTrackSlow.addEventListener("click", () => {
     video.playbackRate = slowSpeed;
-    speedContainer.classList.remove('flex')
-    speedContainer.classList.add('hidden')
-  })
+    speedContainer.classList.remove("flex");
+    speedContainer.classList.add("hidden");
+  });
 
-  speedTrackFast.addEventListener('click',() => {
+  speedTrackFast.addEventListener("click", () => {
     video.playbackRate = speedFast;
-    speedContainer.classList.remove('flex')
-    speedContainer.classList.add('hidden')
-  })
- 
-  
+    speedContainer.classList.remove("flex");
+    speedContainer.classList.add("hidden");
+  });
 
   // ! Menambahkan Logic Subtitle
 
@@ -388,119 +388,176 @@ document.addEventListener("DOMContentLoaded", () => {
   async function vttToArray(vttFile) {
     const response = await fetch(vttFile);
     const text = await response.text();
-  
-    const lines = text.split("\n").map(line => line.trim());
+
+    const lines = text.split("\n").map((line) => line.trim());
     const subtitles = [];
     let index = 0;
-  
+
     while (index < lines.length) {
       if (lines[index] === "WEBVTT" || lines[index] === "") {
         index++; // Lewati header atau baris kosong
         continue;
       }
-  
+
       // Format waktu VTT: 00:00:01.000 --> 00:00:04.000
-      const timeMatch = lines[index].match(/(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})/);
-  
+      const timeMatch = lines[index].match(
+        /(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})/
+      );
+
       if (timeMatch) {
         const start = timeToSeconds(timeMatch[1]); // Konversi waktu ke detik
         const end = timeToSeconds(timeMatch[2]);
         index++;
-  
+
         let subtitleText = "";
         while (index < lines.length && lines[index] !== "") {
           subtitleText += lines[index] + " ";
           index++;
         }
-  
+
         subtitles.push({ start, end, text: subtitleText.trim() });
       }
-  
+
       index++;
     }
-  
+
     return subtitles;
   }
-  
+
   // Fungsi untuk mengubah waktu VTT menjadi detik
   function timeToSeconds(time) {
     const [hh, mm, ss] = time.split(":");
     return parseFloat(hh) * 3600 + parseFloat(mm) * 60 + parseFloat(ss);
   }
-  
+
   // Contoh penggunaan
-  vttToArray("/assets/subtitles/subtitles.vtt").then(subtitles => {
+  vttToArray("/assets/subtitles/subtitles.vtt").then((subtitles) => {
+    let subtitleEnabled = false;
 
-  let subtitleEnabled = false;
+    subtitleTrackID.addEventListener("click", () => {
+      subtitleEnabled = true;
+      subtitleTriger.classList.remove("flex");
+      subtitleTriger.classList.add("hidden");
+    });
 
-  subtitleTrackID.addEventListener('click',() => {
-    subtitleEnabled = true;
-    subtitleTriger.classList.remove('flex');
-    subtitleTriger.classList.add('hidden');
+    subtitleOff.addEventListener("click", () => {
+      subtitleEnabled = false;
+      subtitleTriger.classList.remove("flex");
+      subtitleTriger.classList.add("hidden");
+    });
 
-  })
+    // Update subtitle saat video berjalan
+    video.addEventListener("timeupdate", () => {
+      if (!subtitleEnabled) {
+        subtitleCustom.style.display = "none";
+        return;
+      }
 
-  subtitleOff.addEventListener('click', () => {
-    subtitleEnabled = false;
-    subtitleTriger.classList.remove('flex');
-    subtitleTriger.classList.add('hidden');
-  })
+      let currentTime = video.currentTime;
+      let subtitle = subtitles.find(
+        (s) => currentTime >= s.start && currentTime <= s.end
+      );
 
-  // Update subtitle saat video berjalan
-video.addEventListener("timeupdate", () => {
-  if (!subtitleEnabled) {
-    subtitleCustom.style.display = "none";
-    return;
-  }
+      if (subtitle) {
+        subtitleCustom.textContent = subtitle.text;
+        subtitleCustom.style.display = "block";
+      } else {
+        subtitleCustom.style.display = "none";
+      }
+    });
 
-  let currentTime = video.currentTime;
-  let subtitle = subtitles.find(s => currentTime >= s.start && currentTime <= s.end);
-  
-  if (subtitle) {
-    subtitleCustom.textContent = subtitle.text;
-    subtitleCustom.style.display = "block";
-  } else {
-    subtitleCustom.style.display = "none";
-  }
-});
+    //! Fitur Loading
 
-//! Fitur Loading
+    function loadingCheck() {
+      if (loaderContainer.classList.contains("flex")) {
+        topElements.classList.add("hidden");
+        controlsTengah.classList.add("hidden");
+        controls.classList.add("hidden");
+      } else {
+        loaderContainer.classList.add("hidden");
+      }
+    }
 
-function loadingCheck(){
-  if(loaderContainer.classList.contains('flex')){
-    topElements.classList.add('hidden')
-    controlsTengah.classList.add('hidden')
-    controls.classList.add('hidden')
-  }else{
-    loaderContainer.classList.add('hidden')
-  }
-}
+    loadingCheck();
 
-loadingCheck()
+    // ! Perubahan Resolusi
+    function changeVideoSource(newSrc, videoQuality, defaultQuality) {
+      const currentTime = video.currentTime;
+      const isPlaying = !video.paused;
 
+      video_source.src = newSrc;
+      video.load();
 
+      video.onloadeddata = () => {
+        video.currentTime = currentTime;
+        if (isPlaying) video.play();
+      };
 
-// ! Perubahan Resolusi
-function changeVideoSource(newSrc) {
-  const currentTime = video.currentTime;
-  const isPlaying = !video.paused; 
+      // ! Tambahkan Selected
+      switch (videoQuality) {
+        case "1080p":
+          selected_1080p.classList.remove("hidden");
+          selected_720p.classList.add("hidden");
+          selected_480p.classList.add("hidden");
+          selected_360p.classList.add("hidden");
+          break;
 
-  video_source.src = newSrc; 
-  video.load(); 
+        case "720p":
+          selected_1080p.classList.add("hidden");
+          selected_720p.classList.remove("hidden");
+          selected_480p.classList.add("hidden");
+          selected_360p.classList.add("hidden");
+          break;
 
-  video.onloadeddata = () => {
-    video.currentTime = currentTime; 
-    if (isPlaying) video.play();
-  };
+        case "480p":
+          selected_1080p.classList.add("hidden");
+          selected_720p.classList.add("hidden");
+          selected_480p.classList.remove("hidden");
+          selected_360p.classList.add("hidden");
+          break;
 
-  console.log("Resolusi diubah ke:", newSrc);
-}
+        case "360p":
+          selected_1080p.classList.add("hidden");
+          selected_720p.classList.add("hidden");
+          selected_480p.classList.add("hidden");
+          selected_360p.classList.remove("hidden");
+          break;
+      }
 
-quality_1080p.addEventListener("click", () => {
-  changeVideoSource("assets/video/video.mp4"); 
-});
-quality_720p.addEventListener("click", () => {
-  changeVideoSource("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"); 
-});
+      settingsContentQuality.classList.remove("flex");
+      settingsContentQuality.classList.remove("show");
+      settingsContentQuality.classList.add("hidden");
+    }
+
+    quality_1080p.addEventListener("click", () => {
+      changeVideoSource("assets/video/video.mp4", "1080p");
+    });
+    quality_720p.addEventListener("click", () => {
+      changeVideoSource("assets/video/video.mp4", "720p");
+    });
+    quality_480p.addEventListener("click", () => {
+      changeVideoSource("assets/video/video.mp4", "480p", "default");
+    });
+    quality_360p.addEventListener("click", () => {
+      changeVideoSource("assets/video/video.mp4", "360p");
+    });
+  });
+
+  // Video Loading
+
+  video.addEventListener("waiting", () => {
+    loaderContainer.classList.remove("hidden");
+    loaderContainer.classList.add("flex");
+    topElements.classList.add("hidden");
+    controlsTengah.classList.add("hidden");
+    controls.classList.add("hidden");
+  });
+
+  video.addEventListener("canplay", () => {
+    loaderContainer.classList.remove("flex");
+    loaderContainer.classList.add("hidden");
+    topElements.classList.remove("hidden");
+    controlsTengah.classList.remove("hidden");
+    controls.classList.remove("hidden");
   });
 });
