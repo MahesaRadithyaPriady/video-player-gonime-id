@@ -18,6 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const subtitleTriger = document.querySelector(".settings-content-subtitle");
   const backButtons = document.querySelectorAll(".back-button");
   const settingsMain = document.querySelector(".settings-main");
+  const PIP = document.querySelector(".PIP");
+  const speedContainer = document.querySelector(".settings-content-speed");
+  const speedTriger = document.querySelector("#speed");
+  const volumeBtn = document.querySelector(".volume-toggle");
+  const playPauseTengah = document.querySelector(".play-pause-tengah");
+  const backward = document.querySelector(".backward");
+  const forward = document.querySelector(".forward");
+  const controlsTengah = document.querySelector(".controls-tengah");
 
   let hideControlsTimeout;
   let hideCursorTimeout;
@@ -26,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   video.controls = false;
 
   function hideControls() {
+    clearTimeout(hideControlsTimeout);
     hideControlsTimeout = setTimeout(() => {
       controls.classList.add("hidenn-opacity");
       topElements.classList.add("hidenn-opacity");
@@ -33,6 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
       settingsContainer.classList.remove("show");
       settingsContainer.classList.add("hidenn-opacity");
       subtitleTriger.classList.add("hidenn-opacity");
+      speedContainer.classList.add("hidenn-opacity");
+      controlsTengah.classList.add("hidenn-opacity");
     }, 5000);
   }
 
@@ -43,11 +54,13 @@ document.addEventListener("DOMContentLoaded", () => {
     settingsContainer.classList.remove("hidenn-opacity");
     settingsContentQuality.classList.remove("hidenn-opacity");
     subtitleTriger.classList.remove("hidenn-opacity");
-
-    hideControls(); //! Hide Controls Setelah 5 Detik
+    speedContainer.classList.remove("hidenn-opacity");
+    controlsTengah.classList.remove("hidenn-opacity");
+    hideControls();
   }
 
   function hideCursor() {
+    clearTimeout(hideCursorTimeout);
     hideCursorTimeout = setTimeout(() => {
       videoWrapper.classList.add("hide-cursor");
     }, 5000);
@@ -56,21 +69,64 @@ document.addEventListener("DOMContentLoaded", () => {
   function showCursor() {
     clearTimeout(hideCursorTimeout);
     videoWrapper.classList.remove("hide-cursor");
-    hideCursor(); //! Hide Cursor Setelah 5 Detik
+    hideCursor();
   }
 
-  //! Play/Pause Button
-  playPause.addEventListener("click", () => {
-    if (video.paused) {
-      video.play();
-      playPause.innerHTML = '<i class="fas fa-pause"></i>';
-    } else {
-      video.pause();
-      playPause.innerHTML = '<i class="fas fa-play"></i>';
-    }
+  videoWrapper.addEventListener("mousemove", () => {
+    clearTimeout(idleTimeout);
     showControls();
     showCursor();
+    idleTimeout = setTimeout(() => {
+      hideControls();
+      hideCursor();
+    }, 5000);
   });
+
+  function updatePlayPauseIcon() {
+    const iconBig = video.paused
+      ? '<i class="fas fa-play fa-3x"></i>'
+      : '<i class="fas fa-pause fa-3x"></i>';
+    const icon = video.paused
+      ? '<i class="fas fa-play"></i>'
+      : '<i class="fas fa-pause"></i>';
+    playPause.innerHTML = icon;
+    playPauseTengah.innerHTML = iconBig;
+  }
+
+  //! Play/Pause Logic
+  function togglePlayPause() {
+    if (video.paused) {
+      video.play();
+    } else {
+      video.pause();
+    }
+    updatePlayPauseIcon();
+    showControls();
+    showCursor();
+  }
+
+  playPause.addEventListener("click", togglePlayPause);
+  playPauseTengah.addEventListener("click", togglePlayPause);
+  video.addEventListener("play", updatePlayPauseIcon);
+  video.addEventListener("pause", updatePlayPauseIcon);
+
+  //! Forward (⏩) & Backward (⏪)
+  function forwardVideo() {
+    video.currentTime += 10;
+    updateProgressBar();
+    showControls();
+    showCursor();
+  }
+
+  function backwardVideo() {
+    video.currentTime = Math.max(0, video.currentTime - 10);
+    updateProgressBar();
+    showControls();
+    showCursor();
+  }
+
+  forward.addEventListener("click", forwardVideo);
+  backward.addEventListener("click", backwardVideo);
 
   //! Fullscreen Button
   fullScreen.addEventListener("click", () => {
@@ -163,12 +219,15 @@ document.addEventListener("DOMContentLoaded", () => {
     settingsContainer.classList.toggle("flex");
     if (
       settingsContentQuality.classList.contains("show") ||
-      subtitleTriger.classList.contains("flex")
+      subtitleTriger.classList.contains("flex") ||
+      speedContainer.classList.contains("flex")
     ) {
       settingsContentQuality.classList.remove("show");
       settingsContainer.classList.remove("flex");
       subtitleTriger.classList.add("hidden");
       subtitleTriger.classList.remove("flex");
+      speedContainer.classList.remove("flex");
+      speedContainer.classList.add("hidden");
     }
 
     if (settingsContainer.classList.contains("flex")) {
@@ -183,7 +242,8 @@ document.addEventListener("DOMContentLoaded", () => {
       !settingsContainer.contains(e.target) &&
       !settingsButton.contains(e.target) &&
       !backButton.contains(e.target) &&
-      !subtitleTriger.contains(e.target)
+      !subtitleTriger.contains(e.target) &&
+      !speedContainer.contains(e.target)
     ) {
       settingsContainer.classList.remove("flex");
     }
@@ -213,6 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
       settingsMain.classList.add("show");
       settingsContentQuality.classList.remove("show");
       subtitleTriger.classList.add("hidden");
+      speedContainer.classList.add("hidden");
       settingsContainer.classList.add("flex");
     });
   });
@@ -233,5 +294,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   video.addEventListener("contextmenu", (e) => {
     e.preventDefault();
+  });
+  //! Logika PIP
+  function togglePictureInPicture() {
+    if (document.pictureInPictureElement !== null) {
+      document.exitPictureInPicture();
+    } else {
+      video.requestPictureInPicture();
+    }
+  }
+
+  PIP.addEventListener("click", togglePictureInPicture);
+
+  //! Settings speed trigger
+  speedTriger.addEventListener("click", () => {
+    speedContainer.classList.add("flex");
+    speedContainer.classList.remove("hidden");
+    settingsContainer.classList.remove("flex");
+  });
+  volumeBtn.addEventListener("click", () => {
+    if (video.muted) {
+      video.muted = false;
+      volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    } else {
+      video.muted = true;
+      volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+    }
   });
 });

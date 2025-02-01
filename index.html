@@ -50,7 +50,9 @@
       .controls,
       .top-elements,
       .settings-container,
-      .settings-content-quality {
+      .settings-content-quality,
+      .settings-content-speed,
+      .controls-tengah {
         transition: opacity 0.5s ease-in-out;
       }
 
@@ -83,6 +85,13 @@
       .hiddenAll {
         display: none;
       }
+      .controls-tengah {
+        pointer-events: none;
+      }
+
+      .controls-tengah > div {
+        pointer-events: auto;
+      }
     </style>
   </head>
   <body class="bg-gray-600">
@@ -95,7 +104,15 @@
           >
             <h1 class="text-white font-bold text-2xl">Testing Video</h1>
             <div class="flex gap-3">
-              <button class="bg-gray-800 rounded-full p-3 text-white font-bold">
+              <!-- Tombol Volume -->
+              <button
+                class="volume-toggle bg-gray-800 rounded-full p-3 px-4 text-white font-bold"
+              >
+                <i class="fas fa-volume-up"></i>
+              </button>
+              <button
+                class="PIP bg-gray-800 rounded-full p-3 text-white font-bold"
+              >
                 <i class="fas fa-window-restore"></i>
               </button>
               <button
@@ -126,94 +143,139 @@
                   Subtitle Settings
                 </h1>
               </div>
-              <div class="settings-item flex gap-3">
+              <div class="settings-item flex gap-3" id="speed">
                 <h1 class="text-sm font-bold hover:cursor-pointer">
                   Speed Video Settings
                 </h1>
               </div>
-              <div class="settings-item flex gap-3">
-                <h1 class="text-sm font-bold hover:cursor-pointer">
-                  Sound Settings
-                </h1>
-              </div>
             </div>
-            <!-- Menu Settings Content Quality -->
-            <div
-              class="settings-content-quality absolute flex-col hidden top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3"
-            >
-              <div class="title flex gap-3">
-                <button class="back-button">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <h1 class="text-lg font-bold">Quality Settings</h1>
-              </div>
-              <div class="settings-item flex gap-3 items-center">
-                <div class="icons">
-                  <i class="fa-solid fa-crown"></i>
-                </div>
-                <h1 class="quality-1080 text-sm font-bold hover:cursor-pointer">
-                  1080p
-                </h1>
-              </div>
-              <div class="settings-item flex gap-3 items-center">
-                <div class="icons">
-                  <i class="fa-solid fa-bolt"></i>
-                </div>
-                <h1 class="quality-720p text-sm font-bold hover:cursor-pointer">
-                  720p
-                </h1>
-              </div>
-              <div class="settings-item flex gap-3 items-center">
-                <div class="icons">
-                  <i class="fa-solid fa-bolt"></i>
-                </div>
-                <h1 class="quality-480p text-sm font-bold hover:cursor-pointer">
-                  480p
-                </h1>
-              </div>
-              <div class="settings-item flex gap-3 items-center">
-                <div class="icons">
-                  <i class="fa-solid fa-bolt"></i>
-                </div>
-                <h1 class="quality-360p text-sm font-bold hover:cursor-pointer">
-                  360p
-                </h1>
-              </div>
+          </div>
+          <!-- Menu Settings Content Quality -->
+          <div
+            class="settings-content-quality absolute flex-col hidden top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3"
+          >
+            <div class="title flex gap-3">
+              <button class="back-button">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <h1 class="text-lg font-bold">Quality Settings</h1>
             </div>
-            <!-- Menu Settings Content Subtitle -->
-            <div
-              class="settings-content-subtitle absolute flex-col hidden top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3"
-            >
-              <div class="title flex gap-3">
-                <button class="back-button">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <h1 class="text-lg font-bold">Subtitle Settings</h1>
+            <div class="settings-item flex gap-3 items-center">
+              <div class="icons">
+                <i class="fa-solid fa-crown"></i>
               </div>
-              <div class="settings-item flex gap-3 items-center">
-                <div class="icons">
-                  <i class="fa-regular fa-closed-captioning"></i>
-                </div>
-                <h1 class="subtitle-off text-sm font-bold hover:cursor-pointer">
-                  Off
-                </h1>
+              <h1 class="quality-1080 text-sm font-bold hover:cursor-pointer">
+                1080p
+              </h1>
+            </div>
+            <div class="settings-item flex gap-3 items-center">
+              <div class="icons">
+                <i class="fa-solid fa-bolt"></i>
               </div>
-              <div class="settings-item flex gap-3 items-center">
-                <div class="icons">
-                  <i class="fa-solid fa-closed-captioning"></i>
-                </div>
-                <h1 class="subtitle-id text-sm font-bold hover:cursor-pointer">
-                  Indonesia
-                </h1>
+              <h1 class="quality-720p text-sm font-bold hover:cursor-pointer">
+                720p
+              </h1>
+            </div>
+            <div class="settings-item flex gap-3 items-center">
+              <div class="icons">
+                <i class="fa-solid fa-bolt"></i>
               </div>
-              <div class="settings-item flex gap-3 items-center">
-                <div class="icons">
-                  <i class="fa-regular fa-closed-captioning"></i>
-                </div>
-                <h1 class="subtitle-en text-sm font-bold hover:cursor-pointer">
-                  English
-                </h1>
+              <h1 class="quality-480p text-sm font-bold hover:cursor-pointer">
+                480p
+              </h1>
+            </div>
+            <div class="settings-item flex gap-3 items-center">
+              <div class="icons">
+                <i class="fa-solid fa-bolt"></i>
               </div>
+              <h1 class="quality-360p text-sm font-bold hover:cursor-pointer">
+                360p
+              </h1>
+            </div>
+          </div>
+          <!-- Menu Settings Content Subtitle -->
+          <div
+            class="settings-content-subtitle absolute flex-col hidden top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3"
+          >
+            <div class="title flex gap-3">
+              <button class="back-button">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <h1 class="text-lg font-bold">Subtitle Settings</h1>
+            </div>
+            <div class="settings-item flex gap-3 items-center">
+              <div class="icons">
+                <i class="fa-regular fa-closed-captioning"></i>
+              </div>
+              <h1 class="subtitle-off text-sm font-bold hover:cursor-pointer">
+                Off
+              </h1>
+            </div>
+            <div class="settings-item flex gap-3 items-center">
+              <div class="icons">
+                <i class="fa-solid fa-closed-captioning"></i>
+              </div>
+              <h1 class="subtitle-id text-sm font-bold hover:cursor-pointer">
+                Indonesia
+              </h1>
+            </div>
+            <div class="settings-item flex gap-3 items-center">
+              <div class="icons">
+                <i class="fa-regular fa-closed-captioning"></i>
+              </div>
+              <h1 class="subtitle-en text-sm font-bold hover:cursor-pointer">
+                English
+              </h1>
+            </div>
+          </div>
+          <!-- Menu Settings Content Speed -->
+          <div
+            class="settings-content-speed absolute flex-col hidden top-16 right-2 z-20 text-white bg-gray-800 p-5 rounded-md gap-3"
+          >
+            <div class="title flex gap-3">
+              <button class="back-button">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <h1 class="text-lg font-bold">Speed Settings</h1>
+            </div>
+            <div class="settings-item flex gap-3 items-center">
+              <!-- <div class="icons">
+                  <i class="fa-regular fa-"></i>
+                </div> -->
+              <h1 class="speed-normal text-sm font-bold hover:cursor-pointer">
+                Normal
+              </h1>
+            </div>
+            <div class="settings-item flex gap-3 items-center">
+              <!-- <div class="icons">
+                  <i class="fa-regular fa-"></i>
+                </div> -->
+              <h1 class="speed-0.5x text-sm font-bold hover:cursor-pointer">
+                0.5x Speed
+              </h1>
+            </div>
+            <div class="settings-item flex gap-3 items-center">
+              <!-- <div class="icons">
+                  <i class="fa-regular fa-"></i>
+                </div> -->
+              <h1 class="speed-2x text-sm font-bold hover:cursor-pointer">
+                2x Speed
+              </h1>
+            </div>
+          </div>
+
+          <!-- Controls Di Tengah -->
+          <div
+            class="controls-tengah absolute inset-0 flex justify-center items-center z-30 text-white gap-10 p-5"
+          >
+            <div class="backward hover:cursor-pointer">
+              <i class="fa-solid fa-backward fa-3x"></i>
+            </div>
+            <div class="play-pause-tengah hover:cursor-pointer">
+              <i class="fa-solid fa-play fa-3x"></i>
+            </div>
+            <div class="forward hover:cursor-pointer">
+              <i class="fa-solid fa-forward fa-3x"></i>
             </div>
           </div>
 
@@ -230,11 +292,13 @@
                 </button>
                 <p class="time-line text-white">0:00 / 0:00</p>
               </div>
-              <button
-                class="fullScreen bg-gray-800 rounded-full p-3 px-4 text-white font-bold"
-              >
-                <i class="fas fa-expand"></i>
-              </button>
+              <div class="controls-right gap-3 flex items-center">
+                <button
+                  class="fullScreen bg-gray-800 rounded-full p-3 px-4 text-white font-bold"
+                >
+                  <i class="fas fa-expand"></i>
+                </button>
+              </div>
             </div>
             <!-- Progress Bar -->
             <div class="progress w-full pb-3">
