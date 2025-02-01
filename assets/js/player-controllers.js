@@ -26,6 +26,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const backward = document.querySelector(".backward");
   const forward = document.querySelector(".forward");
   const controlsTengah = document.querySelector(".controls-tengah");
+  const speedTrackNormal = document.querySelector('.speed-normal');
+  const speedTrackSlow = document.querySelector('.speed-0_5x');
+  const speedTrackFast = document.querySelector('.speed-2x');
+  const subtitleTrackID = document.querySelector('.subtitle-id');
+  const subtitleCustom = document.querySelector('.subtitle-custom');
+  const subtitleOff = document.querySelector('.subtitle-off');
+  const loaderContainer = document.querySelector('.loader-container');
+  const quality_1080p = document.querySelector('.quality-1080p');
+  const quality_720p = document.querySelector('.quality-720p');
+  const video_source = document.querySelector('.video-source')
+  const normalSpeed = 1;
+  const slowSpeed = 0.5;
+  const speedFast = 2;
 
   let hideControlsTimeout;
   let hideCursorTimeout;
@@ -82,6 +95,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 5000);
   });
 
+    // ! Ubah Kecepatan Video
+
+    function changeSpeedVideo(trackSpeed){
+      video.playbackRate = trackSpeed
+    }
+  
+
   function updatePlayPauseIcon() {
     const iconBig = video.paused
       ? '<i class="fas fa-play fa-3x"></i>'
@@ -96,7 +116,9 @@ document.addEventListener("DOMContentLoaded", () => {
   //! Play/Pause Logic
   function togglePlayPause() {
     if (video.paused) {
+      video.defaultPlaybackRate = normalSpeed;
       video.play();
+      
     } else {
       video.pause();
     }
@@ -113,14 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
   //! Forward (⏩) & Backward (⏪)
   function forwardVideo() {
     video.currentTime += 10;
-    updateProgressBar();
     showControls();
     showCursor();
   }
 
   function backwardVideo() {
     video.currentTime = Math.max(0, video.currentTime - 10);
-    updateProgressBar();
     showControls();
     showCursor();
   }
@@ -256,6 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   //!! Reset play button ketika video selesai
   video.addEventListener("ended", () => {
+    video.playbackRate = normalSpeed;
     playPause.innerHTML = '<i class="fas fa-play"></i>';
   });
 
@@ -320,5 +341,166 @@ document.addEventListener("DOMContentLoaded", () => {
       video.muted = true;
       volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
     }
+  });
+
+
+  speedTrackNormal.addEventListener('click',() => {
+    video.playbackRate = normalSpeed;
+    speedContainer.classList.remove('flex')
+    speedContainer.classList.add('hidden')
+
+  })
+
+  speedTrackSlow.addEventListener('click',() => {
+    video.playbackRate = slowSpeed;
+    speedContainer.classList.remove('flex')
+    speedContainer.classList.add('hidden')
+  })
+
+  speedTrackFast.addEventListener('click',() => {
+    video.playbackRate = speedFast;
+    speedContainer.classList.remove('flex')
+    speedContainer.classList.add('hidden')
+  })
+ 
+  
+
+  // ! Menambahkan Logic Subtitle
+
+  // const trackID = document.createElement('track');
+  // trackID.src ="/assets/subtitles/subtitles.vtt";
+  // trackID.kind = "subtitles";
+  // trackID.srclang = "id";
+  // trackID.label = "bahasa indonesia";
+  // trackID.default = false;
+
+  // video.appendChild(trackID)
+
+  // subtitleTrackID.addEventListener('click',() => {
+  //   const track = video.textTracks[0];
+  //   track.mode = "showing"
+  //   subtitleTriger.classList.remove('flex')
+  //   subtitleTriger.classList.add('hidden')
+
+  //   console.log("di Klik")
+  // })
+
+  async function vttToArray(vttFile) {
+    const response = await fetch(vttFile);
+    const text = await response.text();
+  
+    const lines = text.split("\n").map(line => line.trim());
+    const subtitles = [];
+    let index = 0;
+  
+    while (index < lines.length) {
+      if (lines[index] === "WEBVTT" || lines[index] === "") {
+        index++; // Lewati header atau baris kosong
+        continue;
+      }
+  
+      // Format waktu VTT: 00:00:01.000 --> 00:00:04.000
+      const timeMatch = lines[index].match(/(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})/);
+  
+      if (timeMatch) {
+        const start = timeToSeconds(timeMatch[1]); // Konversi waktu ke detik
+        const end = timeToSeconds(timeMatch[2]);
+        index++;
+  
+        let subtitleText = "";
+        while (index < lines.length && lines[index] !== "") {
+          subtitleText += lines[index] + " ";
+          index++;
+        }
+  
+        subtitles.push({ start, end, text: subtitleText.trim() });
+      }
+  
+      index++;
+    }
+  
+    return subtitles;
+  }
+  
+  // Fungsi untuk mengubah waktu VTT menjadi detik
+  function timeToSeconds(time) {
+    const [hh, mm, ss] = time.split(":");
+    return parseFloat(hh) * 3600 + parseFloat(mm) * 60 + parseFloat(ss);
+  }
+  
+  // Contoh penggunaan
+  vttToArray("/assets/subtitles/subtitles.vtt").then(subtitles => {
+
+  let subtitleEnabled = false;
+
+  subtitleTrackID.addEventListener('click',() => {
+    subtitleEnabled = true;
+    subtitleTriger.classList.remove('flex');
+    subtitleTriger.classList.add('hidden');
+
+  })
+
+  subtitleOff.addEventListener('click', () => {
+    subtitleEnabled = false;
+    subtitleTriger.classList.remove('flex');
+    subtitleTriger.classList.add('hidden');
+  })
+
+  // Update subtitle saat video berjalan
+video.addEventListener("timeupdate", () => {
+  if (!subtitleEnabled) {
+    subtitleCustom.style.display = "none";
+    return;
+  }
+
+  let currentTime = video.currentTime;
+  let subtitle = subtitles.find(s => currentTime >= s.start && currentTime <= s.end);
+  
+  if (subtitle) {
+    subtitleCustom.textContent = subtitle.text;
+    subtitleCustom.style.display = "block";
+  } else {
+    subtitleCustom.style.display = "none";
+  }
+});
+
+//! Fitur Loading
+
+function loadingCheck(){
+  if(loaderContainer.classList.contains('flex')){
+    topElements.classList.add('hidden')
+    controlsTengah.classList.add('hidden')
+    controls.classList.add('hidden')
+  }else{
+    loaderContainer.classList.add('hidden')
+  }
+}
+
+loadingCheck()
+
+
+
+// ! Perubahan Resolusi
+function changeVideoSource(newSrc) {
+  const currentTime = video.currentTime;
+  const isPlaying = !video.paused; 
+
+  video_source.src = newSrc; 
+  video.load(); 
+
+  video.onloadeddata = () => {
+    video.currentTime = currentTime; 
+    if (isPlaying) video.play();
+  };
+
+  console.log("Resolusi diubah ke:", newSrc);
+}
+
+quality_1080p.addEventListener("click", () => {
+  changeVideoSource("assets/video/video.mp4"); 
+});
+quality_720p.addEventListener("click", () => {
+  changeVideoSource("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"); 
+});
   });
 });

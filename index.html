@@ -92,6 +92,42 @@
       .controls-tengah > div {
         pointer-events: auto;
       }
+      /* HTML: <div class="loader"></div> */
+.loader {
+  width: 50px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 8px solid #ffffff;
+  animation:
+    l20-1 0.8s infinite linear alternate,
+    l20-2 1.6s infinite linear;
+}
+@keyframes l20-1{
+   0%    {clip-path: polygon(50% 50%,0       0,  50%   0%,  50%    0%, 50%    0%, 50%    0%, 50%    0% )}
+   12.5% {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100%   0%, 100%   0%, 100%   0% )}
+   25%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 100% 100%, 100% 100% )}
+   50%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
+   62.5% {clip-path: polygon(50% 50%,100%    0, 100%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
+   75%   {clip-path: polygon(50% 50%,100% 100%, 100% 100%,  100% 100%, 100% 100%, 50%  100%, 0%   100% )}
+   100%  {clip-path: polygon(50% 50%,50%  100%,  50% 100%,   50% 100%,  50% 100%, 50%  100%, 0%   100% )}
+}
+@keyframes l20-2{ 
+  0%    {transform:scaleY(1)  rotate(0deg)}
+  49.99%{transform:scaleY(1)  rotate(135deg)}
+  50%   {transform:scaleY(-1) rotate(0deg)}
+  100%  {transform:scaleY(-1) rotate(-135deg)}
+}
+
+.loader-container.hidden{
+  display: hidden;
+}
+
+.quality-720p.hidden {
+  display: none;
+}
+.quality-1080p.hidden {
+  display: none;
+}
     </style>
   </head>
   <body class="bg-gray-600">
@@ -164,7 +200,7 @@
               <div class="icons">
                 <i class="fa-solid fa-crown"></i>
               </div>
-              <h1 class="quality-1080 text-sm font-bold hover:cursor-pointer">
+              <h1 class="quality-1080p text-sm font-bold hover:cursor-pointer">
                 1080p
               </h1>
             </div>
@@ -250,7 +286,7 @@
               <!-- <div class="icons">
                   <i class="fa-regular fa-"></i>
                 </div> -->
-              <h1 class="speed-0.5x text-sm font-bold hover:cursor-pointer">
+              <h1 class="speed-0_5x text-sm font-bold hover:cursor-pointer">
                 0.5x Speed
               </h1>
             </div>
@@ -277,7 +313,23 @@
             <div class="forward hover:cursor-pointer">
               <i class="fa-solid fa-forward fa-3x"></i>
             </div>
+             
           </div>
+
+          <!-- Subtitle Costume -->
+          <div class="flex justify-center items-center w-full relative bg-gray-900 z-40">
+            <div class="subtitle-custom text-2xl font-serif absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-70 px-8 py-2 rounded-md max-w-96 min-w-[500px] min-h-[50px] text-center break-words">
+              <!-- Subtitle akan muncul di sini -->
+            </div>
+          </div>
+
+          <div class="loader-container absolute inset-0   justify-center items-center z-50">
+            <div class="loader"></div>
+          </div>
+          
+
+
+        
 
           <!-- Kontrol Video -->
           <div
@@ -310,7 +362,8 @@
 
           <!-- Video Player -->
           <video class="rounded-lg">
-            <source src="assets/video/video.mp4" />
+            <source class="video-source" src="assets/video/video.mp4" />
+          
           </video>
         </div>
       </div>
